@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>群聊</title>
+    <style>
+        /* 定义消息框的样式 */
+        .message_container {
+            display: flex;
+            flex-direction: column;
+            background-color: #d0cfcf;
+            /* 消息框背景颜色 */
+            padding: 10px;
+            /* 消息框内边距 */
+            margin-bottom: 10px;
+            /* 消息框之间的间距 */
+            border-radius: 10px;
+            /* 圆角边框 */
+            width: 400px;
+            /* 设置宽度 */
+            height: 500px;
+            /* 设置高度 */
+        }
+
+        .message {
+            background-color: #f1f0f0;
+            /* 消息框背景颜色 */
+            width : fit-content;
+            padding: 10px;
+            /* 消息框内边距 */
+            max-width: 80%; /* 最大宽度，避免消息过宽 */
+            word-wrap: break-word; /* 长文字换行 */
+            margin-bottom: 10px;
+            /* 消息框之间的间距 */
+            border-radius: 10px;
+            /* 圆角边框 */
+            /* 最大宽度 */
+            height: 20px;
+        }
+
+        /* 定义用户发送消息的样式 */
+        .sent {
+            background-color: #79c83d;
+            color: rgb(4, 4, 4);
+            align-self: flex-end;
+        }
+
+        /* 定义接收到的消息的样式 */
+        .received {
+            background-color: #fbf9f9;
+            color: black;
+            align-self: flex-start;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="message_container" id="message_container"></div>
+    <div>
+        <input type="text" id="input" placeholder="输入消息..." onkeyup="handleInput(event)">
+        <button onclick="sendMessage()">发送</button>
+    </div>
+
+    <script>
+        // 创建 WebSocket 连接
+        const socket = new WebSocket('ws://127.0.0.1:8000/room/{{group_id}}/');
+
+        // 处理连接打开事件
+        socket.onopen = function (event) {
+            console.log('WebSocket 连接已打开');
+        };
+        //发送消息函数
+        function sendMessage() {
+            const input = document.getElementById('input');
+            socket.send(input.value);
+            input.value = '';
+        }
+
+        socket.onmessage = function (event) {
+            const messageContainer = document.getElementById('message_container');
+            const message = document.createElement('div');
+            message.textContent = event.data;
+            message.classList.add('message');
+            messageContainer.appendChild(message);
+        };
+
+        // 处理连接关闭事件
+        socket.onclose = function (event) {
+            console.log('WebSocket 连接已关闭');
+        };
+
+        // 处理发送消息
+
+
+        // 处理输入框回车事件
+        function handleInput(event) {
+            if (event.keyCode === 13) {
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+
+</html>
